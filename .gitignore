@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+
+# SwiftPM
+/.build/
+/.swiftpm/
+/Packages/
+
+# Local tool/cache dirs created during development in this repo
+/.home/
+
+# Xcode user-specific / generated files
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+
+# Nested Xcode project user data (keep project.pbxproj tracked)
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Optional local environment secrets
+.netrc
+.env
+.env.*
+
+# Local binaries / downloads (keep source code and config tracked)
+swiftly.pkg
+
+# Logs / temp
+*.log
+*.tmp
