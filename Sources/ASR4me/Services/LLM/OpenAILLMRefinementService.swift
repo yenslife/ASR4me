@@ -45,7 +45,7 @@ struct OpenAILLMRefinementService: TextRefinementService {
     }
 
     private func systemPrompt(for mode: RefinementMode, context: RefinementContext?) -> String {
-        var prompt = "You are a text post-processor for speech transcription. Preserve meaning, names, and bilingual Chinese/English terms. Output only the rewritten text."
+        var prompt = "You are a text post-processor for speech transcription. Preserve meaning, names, and bilingual Traditional Chinese/English terms. Output only the rewritten text."
         if let hint = context?.preferredLanguageHint {
             prompt += " Preferred language hint: \(hint)."
         }
