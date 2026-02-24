@@ -148,24 +148,21 @@ final class AppSessionController: ObservableObject {
             state = .showingResult(transcription)
 
             if settingsStore.quickCopySpellingFixMode {
-                let refined: RefinedTextResult
-                do {
-                    refined = try await refinementService.refine(
-                        text: transcription.rawText,
-                        mode: .spellingFix,
-                        context: refinementContext(for: .spellingFix)
-                    )
-                } catch let error as AppError {
-                    throw error
-                } catch {
-                    throw AppError.llmRefinementFailed(error.localizedDescription)
-                }
+                let refined = try await spellingFix(text: transcription.rawText)
                 refinementResults[.spellingFix] = refined
                 activeRefinementMode = .spellingFix
                 try await deliverOutputText(refined.outputText, message: "已拼字修正")
             } else {
                 if settingsStore.autoPasteToFocusedCursor {
-                    try await deliverOutputText(transcription.rawText, message: "已轉寫")
+                    switch settingsStore.autoPasteContentMode {
+                    case .rawTranscription:
+                        try await deliverOutputText(transcription.rawText, message: "已轉寫")
+                    case .spellingFix:
+                        let refined = try await spellingFix(text: transcription.rawText)
+                        refinementResults[.spellingFix] = refined
+                        activeRefinementMode = .spellingFix
+                        try await deliverOutputText(refined.outputText, message: "已拼字修正")
+                    }
                 } else {
                     statusMessage = "辨識完成"
                 }
@@ -199,6 +196,20 @@ final class AppSessionController: ObservableObject {
             preferredLanguageHint: settingsStore.defaultLanguagePolicy,
             userCustomizationPrompt: customPrompt
         )
+    }
+
+    private func spellingFix(text: String) async throws -> RefinedTextResult {
+        do {
+            return try await refinementService.refine(
+                text: text,
+                mode: .spellingFix,
+                context: refinementContext(for: .spellingFix)
+            )
+        } catch let error as AppError {
+            throw error
+        } catch {
+            throw AppError.llmRefinementFailed(error.localizedDescription)
+        }
     }
 
     private func deliverOutputText(_ text: String, message: String) async throws {

@@ -27,6 +27,11 @@ struct SettingsView: View {
                     Text("錄音完成後會把結果貼到目前游標位置（需要『輔助使用』權限）。啟用時不會跳結果視窗。若同時啟用 Quick copy mode，會先做拼字修正再貼上。")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    Picker("Auto paste content", selection: $settings.autoPasteContentMode) {
+                        ForEach(AutoPasteContentMode.allCases) { mode in
+                            Text(mode.title).tag(mode)
+                        }
+                    }
                 }
 
                 Picker("Hotkey", selection: Binding(

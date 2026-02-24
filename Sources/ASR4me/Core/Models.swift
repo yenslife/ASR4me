@@ -85,6 +85,20 @@ enum OfflineModelVariant: String, CaseIterable, Codable, Identifiable {
     }
 }
 
+enum AutoPasteContentMode: String, CaseIterable, Codable, Identifiable, Sendable {
+    case rawTranscription
+    case spellingFix
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .rawTranscription: "原始轉寫"
+        case .spellingFix: "拼字修正版本"
+        }
+    }
+}
+
 struct HotkeyShortcut: Codable, Equatable, Sendable {
     let keyCode: UInt32
     let carbonModifiers: UInt32
@@ -107,6 +121,7 @@ struct UserSettingsSnapshot: Sendable {
     let whisperBinaryPath: String?
     let quickCopySpellingFixMode: Bool
     let autoPasteToFocusedCursor: Bool
+    let autoPasteContentMode: AutoPasteContentMode
 }
 
 enum AppError: Error, LocalizedError, Sendable {

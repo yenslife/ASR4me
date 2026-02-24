@@ -28,7 +28,8 @@ final class AppEnvironment: ObservableObject {
             playStartStopSounds: true,
             whisperBinaryPath: nil,
             quickCopySpellingFixMode: false,
-            autoPasteToFocusedCursor: false
+            autoPasteToFocusedCursor: false,
+            autoPasteContentMode: .spellingFix
         )
 
         let cloudASR = CloudOpenAIASRService(apiKeyProvider: { [weak settingsStore] in

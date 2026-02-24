@@ -11,6 +11,7 @@ final class SettingsStore: ObservableObject, @unchecked Sendable {
     @Published var whisperBinaryPath: String
     @Published var quickCopySpellingFixMode: Bool
     @Published var autoPasteToFocusedCursor: Bool
+    @Published var autoPasteContentMode: AutoPasteContentMode
     @Published var spellingFixCustomizationPrompt: String
 
     private let defaults: UserDefaults
@@ -26,6 +27,7 @@ final class SettingsStore: ObservableObject, @unchecked Sendable {
         self.whisperBinaryPath = defaults.string(forKey: Keys.whisperBinaryPath) ?? Self.recommendedWhisperBinaryPath()
         self.quickCopySpellingFixMode = defaults.object(forKey: Keys.quickCopySpellingFixMode) as? Bool ?? false
         self.autoPasteToFocusedCursor = defaults.object(forKey: Keys.autoPasteToFocusedCursor) as? Bool ?? false
+        self.autoPasteContentMode = AutoPasteContentMode(rawValue: defaults.string(forKey: Keys.autoPasteContentMode) ?? "") ?? .spellingFix
         self.spellingFixCustomizationPrompt = defaults.string(forKey: Keys.spellingFixCustomizationPrompt) ?? ""
     }
 
@@ -43,7 +45,8 @@ final class SettingsStore: ObservableObject, @unchecked Sendable {
             playStartStopSounds: playStartStopSounds,
             whisperBinaryPath: whisperBinaryPath.isEmpty ? nil : whisperBinaryPath,
             quickCopySpellingFixMode: quickCopySpellingFixMode,
-            autoPasteToFocusedCursor: autoPasteToFocusedCursor
+            autoPasteToFocusedCursor: autoPasteToFocusedCursor,
+            autoPasteContentMode: autoPasteContentMode
         )
     }
 
@@ -61,6 +64,7 @@ final class SettingsStore: ObservableObject, @unchecked Sendable {
         defaults.set(whisperBinaryPath, forKey: Keys.whisperBinaryPath)
         defaults.set(quickCopySpellingFixMode, forKey: Keys.quickCopySpellingFixMode)
         defaults.set(autoPasteToFocusedCursor, forKey: Keys.autoPasteToFocusedCursor)
+        defaults.set(autoPasteContentMode.rawValue, forKey: Keys.autoPasteContentMode)
         defaults.set(spellingFixCustomizationPrompt, forKey: Keys.spellingFixCustomizationPrompt)
         defaults.set(shortcut.keyCode, forKey: Keys.shortcutKeyCode)
         defaults.set(shortcut.carbonModifiers, forKey: Keys.shortcutModifiers)
@@ -91,6 +95,7 @@ final class SettingsStore: ObservableObject, @unchecked Sendable {
         static let whisperBinaryPath = "whisperBinaryPath"
         static let quickCopySpellingFixMode = "quickCopySpellingFixMode"
         static let autoPasteToFocusedCursor = "autoPasteToFocusedCursor"
+        static let autoPasteContentMode = "autoPasteContentMode"
         static let spellingFixCustomizationPrompt = "spellingFixCustomizationPrompt"
         static let shortcutKeyCode = "shortcut.keyCode"
         static let shortcutModifiers = "shortcut.modifiers"
