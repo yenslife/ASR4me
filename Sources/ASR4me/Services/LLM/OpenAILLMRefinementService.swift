@@ -15,7 +15,7 @@ struct OpenAILLMRefinementService: TextRefinementService {
         }
 
         let payload = ChatCompletionsRequest(
-            model: "gpt-4.1-mini",
+            model: "gpt-5.4-nano-2026-03-17",
             messages: [
                 .init(role: "system", content: systemPrompt(for: mode, context: context)),
                 .init(role: "user", content: text)
@@ -45,14 +45,19 @@ struct OpenAILLMRefinementService: TextRefinementService {
     }
 
     private func systemPrompt(for mode: RefinementMode, context: RefinementContext?) -> String {
-        var prompt = "You are a text post-processor for speech transcription. Preserve meaning, names, and bilingual Traditional Chinese/English terms. Output only the rewritten text."
+        var prompt = "You are a text post-processor for speech-to-text transcription.\n"
+        prompt += "Preserve the original meaning, proper names, and specialized terms.\n"
+        prompt += "Keep bilingual Traditional Chinese and English terms unchanged.\n"
+        prompt += "Output only the rewritten text without any explanations or commentary."
+
         if let hint = context?.preferredLanguageHint {
-            prompt += " Preferred language hint: \(hint)."
+            prompt += "\nPrefer output in: \(hint)."
         }
         if let custom = context?.userCustomizationPrompt, !custom.isEmpty {
-            prompt += " User customization (must follow when applicable, especially for names/terms): \(custom)"
+            prompt += "\nCustom instructions: \(custom)"
         }
-        prompt += " Task: \(mode.instruction)"
+
+        prompt += "\nTask: \(mode.instruction)"
         return prompt
     }
 

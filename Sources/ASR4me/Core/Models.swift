@@ -26,13 +26,13 @@ enum RefinementMode: String, CaseIterable, Codable, Identifiable, Sendable {
     var instruction: String {
         switch self {
         case .spellingFix:
-            return "Correct spelling and punctuation mistakes while preserving the original meaning and mixed Chinese/English terms."
+            return "Correct spelling, punctuation, and grammar errors."
         case .formalTone:
-            return "Rewrite the text in a professional and formal tone. Keep the original meaning."
+            return "Rewrite the text in a professional and formal tone."
         case .conciseRewrite:
-            return "Rewrite the text to be concise and clear while preserving meaning."
+            return "Rewrite the text to be concise and clear."
         case .customPrompt:
-            return "Refine the text."
+            return "Refine the text following the custom instructions above."
         }
     }
 }
