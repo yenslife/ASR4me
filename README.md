@@ -1,3 +1,5 @@
+<img src="icon.png" width="64" align="right">
+
 # ASR4me
 
 `ASR4me` 是一個 macOS 原生（`Swift + SwiftUI + AppKit`）的語音轉文字工具，支援：
