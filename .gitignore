@@ -33,3 +33,6 @@ swiftly.pkg
 # Logs / temp
 *.log
 *.tmp
+
+# export app
+ASR4me*.app
