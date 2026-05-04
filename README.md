@@ -17,10 +17,12 @@
   - `Config/ASR4me.entitlements`
   - `Config/ASR4me.xcconfig`
 
-## 專案結構（協作重點）
+## 專案結構
 
 - `Sources/ASR4me/`：主要 app 程式碼（App / Core / Services / UI）
 - `Config/`：`Info.plist`、entitlements、xcconfig（Xcode target 需引用）
+- `Scripts/`：打包與圖示產生腳本
+- `Resources/`：App icon（`.icns`）、DMG 背景圖
 - `Package.swift`：SwiftPM 開發驗證入口
 - `ASR4me/ASR4me.xcodeproj`：正式 macOS app target（團隊開發用）
 
@@ -130,3 +132,75 @@ swift build --disable-sandbox
   - 錄音後把文字貼到目前焦點游標（需 Accessibility）
 - `Spelling Fix Customization`：
   - 個人化專有名詞/人名/用語偏好，會套用在 LLM 的拼字修正 prompt
+
+## App Icon
+
+### 更換圖示
+
+1. 將你的 icon 圖片放在專案根目錄，命名為 `icon.png`（建議 1024×1024 以上）
+2. 執行：
+
+```bash
+./Scripts/generate-icon.sh
+```
+
+此腳本會自動：
+- 產生所有 macOS 需要的尺寸（16×16 ~ 1024×1024，含 @2x）
+- 輸出 `Resources/AppIcon.icns`
+- 將各尺寸 PNG 複製到 `ASR4me/ASR4me/Assets.xcassets/AppIcon.appiconset/`
+- 更新 `Contents.json` 參照
+
+Xcode build 時會自動從 Assets.xcassets 讀取 AppIcon 並打包進 `.app`。
+
+### 檔案說明
+
+| 檔案 | 用途 |
+|------|------|
+| `icon.png` | 原始圖示（手動放置） |
+| `Resources/AppIcon.icns` | macOS 圖示格式（由腳本產生） |
+| `Resources/AppIcon.iconset/` | 各尺寸 PNG 暫存（由腳本產生） |
+| `Scripts/generate-icon.sh` | 圖示產生腳本 |
+
+## 打包成 DMG
+
+### 前置準備
+
+1. 確認已在 Xcode 中設定好 `ASR4me` scheme（參考上方「第一次在 Xcode 開發」）
+2. 確認 `icon.png` 已轉換（參考上方「App Icon」）
+3. 產生 DMG 背景圖（可選，已有預設背景）：
+
+```bash
+python3 Scripts/generate-background.py
+```
+
+4. 若無 Apple Developer ID 簽署，修改 `Scripts/exportOptions.plist`：
+   - `method` 改為 `development`
+
+### 一鍵打包
+
+```bash
+./Scripts/create-dmg.sh
+```
+
+腳本會自動依序執行：
+
+1. **Archive** - 以 Release configuration 封存
+2. **Export** - 匯出 `.app`
+3. **準備內容** - 複製 app + 建立 `/Applications` 替身
+4. **掛載暫存 DMG** - 建立可讀寫暫存映像檔
+5. **設定佈局** - 透過 AppleScript 設定 Finder 視窗大小、圖示位置、背景圖
+6. **產出最終 DMG** - 壓縮輸出到 `build/ASR4me.dmg`
+
+### 客製化 DMG 外觀
+
+- **背景圖**：替換 `Resources/dmg-background.png`（建議 660×400），或修改 `Scripts/generate-background.py`
+- **圖示位置**：修改 `Scripts/create-dmg.sh` 中的 `set position of item` 座標
+- **視窗大小**：修改 `Scripts/create-dmg.sh` 中的 `set the bounds` 數值
+
+### DMG 使用者體驗
+
+使用者雙擊 `.dmg` 後會看到客製化視窗：
+- 左側：`ASR4me.app` 圖示
+- 右側：`Applications` 資料夾替身
+- 底部：提示文字「將 ASR4me 拖曳到 Applications 資料夾」
+- 直接拖曳 app 到 Applications 即可完成安裝
